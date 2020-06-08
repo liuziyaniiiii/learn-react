@@ -17,8 +17,10 @@ const Comment = () => lazy(() => import("@pages/Edu/Comment"));
 const Course = () => lazy(() => import("@pages/Edu/Course"));
 const Subject = () => lazy(() => import("@pages/Edu/Subject"));
 const Teacher = () => lazy(() => import("@pages/Edu/Teacher"));
+// const Listen = () => lazy(() => import("@pages/Edu/Listen"));
 const Settings = () => lazy(() => import("@pages/User/Settings"));
 const Center = () => lazy(() => import("@pages/User/Center"));
+
 
 export default {
   Admin,
@@ -34,6 +36,7 @@ export default {
   Course,
   Subject,
   Teacher,
+  // Listen,
   Settings,
   Center,
 };
