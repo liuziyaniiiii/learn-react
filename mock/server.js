@@ -17,6 +17,29 @@ app.use((req, res, next) => {
   next(); // 触发下一个中间件/路由
 });
 
+app.get("/admin/edu/subject/get/:parentId",(req,res,next)=>{
+  const{
+    parentId,
+  }=req.params;
+  const total = Random.integer(1,5);
+  const data = Mock.mock({
+    total,
+    [`items|${total}`]: [
+      {
+        "_id|+1": 100,
+        title: "@ctitle(2,5)",
+        parentId,
+      },
+    ],
+  });
+  res.json({
+    code:20000,
+    success:true,
+    data,
+    message:"",
+  });
+});
+
 // http://47.103.203.152/admin/edu/subject/:page/:limit
 app.get('/admin/edu/subject/:page/:limit',(req,res,next)=>{
   // 获取params参数
@@ -43,8 +66,8 @@ app.get('/admin/edu/subject/:page/:limit',(req,res,next)=>{
     success: true,
     data,
     message:"",
-  })
-})
+  });
+});
 
 app.listen(9527,"localhost",(err)=>{
   if(err){
