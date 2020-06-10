@@ -1,20 +1,19 @@
 import { GET_SUBJECT_LIST ,GET_SUB_SUBJECT_LIST} from "./constants";
 
-// 初始化数据
 const initSubjectList = {
-  total: 0, // 总数
-  items: [] // 课程分类列表数据
+  total: 0, 
+  items: [] 
 };
 
 export default function subjectList(prevState = initSubjectList, action) {
   switch (action.type) {
-    case GET_SUBJECT_LIST: // 获取一级课程分类数据
+    case GET_SUBJECT_LIST: 
       return{
         total:action.data.total,
         items:action.data.items.map((subject)=>{
           return{
             ...subject,
-            children:[],
+            children:[],//作用:可以展开,添加一个children属性,才会有展开图标
           }
         })
       };

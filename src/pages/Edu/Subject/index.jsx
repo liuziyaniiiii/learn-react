@@ -10,42 +10,41 @@ import { getSubjectList, getSubSubjectList } from "./redux";
 import "./index.less";
 
 @connect(
-  (state) => ({ subjectList: state.subjectList }), // 状态数据
+  (state) => ({ subjectList: state.subjectList }),
   {
-    // 更新状态数据的方法
     getSubjectList,
     getSubSubjectList,
   }
 )
 class Subject extends Component {
   state = {
-    expandedRowKeys: [], // 展开项
+    expandedRowKeys: [], 
   };
 
   componentDidMount() {
-    // 代表一上来请求第一页数据
     this.props.getSubjectList(1, 10);
   }
 
   
   handleExpandedRowsChange = (expandedRowKeys) => {
-    console.log("handleExpandedRowsChange", expandedRowKeys);
-    // 长度
+    // console.log("handleExpandedRowsChange", expandedRowKeys);
     const length = expandedRowKeys.length;
-
-    // 如果最新长度大于之前的长度，说明就是展开~
+    // 如果最新长度大于当前的长度,需要更新expandedRowKeys并发送请求
+    //但如果是关闭,只需要更新expandedRowKeys,但不发送请求
     if (length > this.state.expandedRowKeys.length) {
-      // 点击要展开的最后一项值~
       const lastKey = expandedRowKeys[length - 1];
-      // 发送请求，请求要展开菜单的二级菜单数据
       this.props.getSubSubjectList(lastKey);
     }
-
-    // 更新state --> 告诉Table哪个子菜单需要展开
+    // 更新状态
     this.setState({
       expandedRowKeys,
     });
   };
+
+  //显示添加界面
+  showAddSubject = ()=>{
+    this.props.history.push("/edu/subject/add");
+  }
 
   render() {
     const { subjectList, getSubjectList } = this.props;
@@ -77,14 +76,16 @@ class Subject extends Component {
 
     return (
       <div className="subject">
-        <Button type="primary" className="subject-btn">
+        <Button type="primary" className="subject-btn" onClick={this.showAddSubject}>
           <PlusOutlined />
           新建
         </Button>
         <Table
           columns={columns} // 决定列头
           expandable={{
+            //控制展开的行,内部默认会使用children作为展开的子菜单
             expandedRowKeys,
+            //展开行时触发的回调,将展开的行作为参数传入
             onExpandedRowsChange: this.handleExpandedRowsChange,
           }}
           dataSource={subjectList.items}
