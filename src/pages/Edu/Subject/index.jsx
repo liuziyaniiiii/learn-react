@@ -95,35 +95,37 @@
 import React, { Component } from 'react'
 import {Button,Table} from 'antd';
 import {PlusOutlined ,FormOutlined, DeleteOutlined} from '@ant-design/icons'
-
-import {reqGetSubjectList} from "@api/edu/subject"
+import {getSubjectList} from "./redux"
+import {connect} from "react-redux"
+// import {reqGetSubjectList} from "@api/edu/subject"
 
 import './index.less'
-export default class Subject extends Component {
-  state={
-    subjects:{
-      total:0,
-      items:[],
-    },
-  };
 
+@connect(
+  (state)=>({subjectList:state.subjectList}),
+  {
+    getSubjectList,
+  }
+)
+class Subject extends Component {
+  
   componentDidMount(){
-    this.getSubjectList(1,10);
+    this.props.getSubjectList(1,10);
   }
 
-  getSubjectList = async (page,limit)=>{
-    const result = await reqGetSubjectList(page,limit);
-    this.setState({
-      subjects:result,
-    });
-  };
+  // getSubjectList = async (page,limit)=>{
+  //   const result = await reqGetSubjectList(page,limit);
+  //   this.setState({
+  //     subjects:result,
+  //   });
+  // };
 
-  handleSizeChange = (page,size)=>{
-    this.getSubjectList(page,size)
-  }
+  // handleSizeChange = (current,size)=>{
+  //   this.getSubjectList(current,size)
+  // }
 
   render() {
-    const {subjects} = this.state;
+    const {subjectList,getSubjectList} = this.props;
     const columns = [
       {  title: '分类名称',
          dataIndex: 'title', //代表当前列要显示data中哪个数据(显示数据的keyshux)
@@ -143,15 +145,6 @@ export default class Subject extends Component {
       },
     ];
     
-    // const data = [
-    //   {
-    //     key: 1,
-    //     name: 'John Brown',
-    //     age: 32,
-    //     address: 'New York No. 1 Lake Park',
-    //     description: 'My name is John Brown, I am 32 years old, living in New York No. 1 Lake Park.',
-    //   },
-    // ];
     return (
       <div className="subject">
         <Button type="primary" className="subject-btn">
@@ -166,19 +159,20 @@ export default class Subject extends Component {
             // 具体决定每一行是否可以展开
             rowExpandable: record => record.name !== 'Not Expandable',
           }}
-          dataSource={subjects.items} //决定每一行的数据
+          dataSource={subjectList.items} //决定每一行的数据
           rowKey="_id"
           pagination={{
-            total:subjects.total,
+            total:subjectList.total,
             showQuickJumper: true, // 是否显示快速跳转
             showSizeChanger: true, // 是否显示修改每页显示数量
             pageSizeOptions: ["5", "10", "15", "20"],
             defaultPageSize: 10,
-            onChange: this.getSubjectList,
-            onShowSizeChange: this.handleSizeChange
+            onChange: getSubjectList,
+            onShowSizeChange: getSubjectList
           }}
         />,
       </div>
     )
   }
 }
+export default Subject
