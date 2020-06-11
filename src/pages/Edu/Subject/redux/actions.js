@@ -1,9 +1,9 @@
 // 同步action 返回值是action对象
 // 异步action 返回值是函数,接收dispatch为参数
 
-import {reqGetSubjectList,reqGetSubSubjectList} from '@api/edu/subject'
+import {reqGetSubjectList,reqGetSubSubjectList,reqUpdateSubject} from '@api/edu/subject'
 
-import {GET_SUBJECT_LIST,GET_SUB_SUBJECT_LIST} from "./constants"
+import {GET_SUBJECT_LIST,GET_SUB_SUBJECT_LIST,UPDATE_SUBJECT} from "./constants"
 
 // 获取一级课程分类数据
 const getSubjectListSync = (subjectList) => ({
@@ -37,3 +37,18 @@ export const getSubSubjectList = (parentId)=>{
     });
   };
 };
+//更新课程分类数据
+const updateSubjectSync = (subject)=>({
+  type:UPDATE_SUBJECT,
+  data:subject,
+})
+
+export const updateSubject = (title,id)=>{
+  return (dispatch)=>{
+    return reqUpdateSubject(title,id).then((response)=>{
+      const subject = {title,_id:id};
+      dispatch(updateSubjectSync(subject));
+      return subject;
+    })
+  }
+}

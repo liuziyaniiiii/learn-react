@@ -25,6 +25,7 @@ function AddSubject({total,getSubjectList,history}) {
     }
     //工厂函数组件,发送请求数据
     useEffect(()=>{
+        page = 1;
         const fetchData = async ()=>{
             const items = await getSubjectList(page++,10);
             setSubjects(items);
