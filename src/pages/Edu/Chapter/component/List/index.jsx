@@ -9,12 +9,13 @@ import {
     DeleteOutlined,
 }from "@ant-design/icons"
 import {connect} from 'react-redux'
+import {withRouter} from 'react-router-dom'
 
 import {getAllLessonList} from "../../redux"
 
 import "./index.less"
 
-
+@withRouter
 @connect((state)=>({chapters:state.chapter.chapters}),{getAllLessonList})
 class List extends Component {
     state = {
@@ -31,6 +32,11 @@ class List extends Component {
           expandedRowKeys,
         });
       };
+    showAddLesson = (chapter)=>{
+        return ()=>{
+            this.props.history.push('/edu/chapter/addlesson',chapter)
+        }
+    }
     render() {
         const {chapters} = this.props;
         const {expandedRowKeys} = this.state
@@ -58,7 +64,10 @@ class List extends Component {
                             {
                                 "free" in data ? null:(
                                     <Tooltip title="新增课时">
-                                        <Button type="primary" className="chapter-btn">
+                                        <Button type="primary" 
+                                        className="chapter-btn"
+                                        onClick={this.showAddLesson(data)}
+                                    >
                                             <PlusOutlined/>
                                         </Button>
                                     </Tooltip>
