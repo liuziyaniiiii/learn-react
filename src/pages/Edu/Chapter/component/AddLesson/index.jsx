@@ -1,7 +1,10 @@
 import React from 'react'
-import {PageHeader,Form,Card,Input,Button,Switch} from 'antd'
+import {PageHeader,Form,Card,Input,Button,Switch, message} from 'antd'
 
 import Upload from '@comps/UpLoad'
+
+
+import {reqAddLesson} from "@api/edu/lesson"
 
 import './index.less'
 
@@ -10,9 +13,16 @@ const layout = {
     wrapperCol: {span:5},
 }
 
-export default function AddLesson() {
-    const onFinish = ()=>{}
-    const onBack = ()=>{}
+export default function AddLesson({location,history}) {
+    const onFinish = async (values)=>{
+        const chapterId = location.state._id
+        await reqAddLesson({...values,chapterId})
+        message.success('添加课时成功')
+        history.push("edu/chapter/list")
+    }
+    const onBack = ()=>{
+        history.push("edu/chapter/list")
+    }
       return (
                 <Card 
                     title={
@@ -28,6 +38,7 @@ export default function AddLesson() {
                         {...layout}
                         name="basic"
                         onFinish={onFinish}
+                        initialValues={{free:true}}
                         >
                         <Form.Item
                             label="课时名称"
@@ -41,11 +52,14 @@ export default function AddLesson() {
                             label="是否免费"
                             name="parentId"
                             valuePropName="checked"
+                            rules={[{ required: true, message: '请选择是否免费' }]}
                         >
                             <Switch checkedChildren="是" unCheckedChildren="否" defaultChecked />
                         </Form.Item>
                         
-                        <Upload/>
+                        <Form.Item name="video" rules={[{ required: true, message: '请上传视频' }]}>
+                            <Upload className="upload"/>
+                        </Form.Item>
 
                         <Form.Item>
                             <Button type="primary" htmlType="submit" className="addlesson-button">

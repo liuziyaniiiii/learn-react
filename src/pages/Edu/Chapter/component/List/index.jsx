@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {Button,Tooltip,Alert,Table} from 'antd'
+import {Button,Tooltip,Alert,Table,Modal} from 'antd'
 import {
     PlusOutlined,
     FullscreenOutlined,
@@ -7,9 +7,13 @@ import {
     SettingOutlined,
     FormOutlined,
     DeleteOutlined,
+    EyeOutlined
+
 }from "@ant-design/icons"
 import {connect} from 'react-redux'
 import {withRouter} from 'react-router-dom'
+
+import Player from 'griffith'
 
 import {getAllLessonList} from "../../redux"
 
@@ -20,6 +24,8 @@ import "./index.less"
 class List extends Component {
     state = {
         expandedRowKeys:[],
+        isShowVideoModal:false,
+        lesson:{}
     };
     handleExpandedRowsChange = (expandedRowKeys) => {
         const length = expandedRowKeys.length;
@@ -37,9 +43,24 @@ class List extends Component {
             this.props.history.push('/edu/chapter/addlesson',chapter)
         }
     }
+    showVideoModal = (lesson)=>{
+        return ()=>{
+            this.setState({
+                isShowVideoModal:true,
+                lesson,
+            })
+        }
+    }
+
+    hiddenVidoModal = ()=>{
+        this.setState({
+            isShowVideoModal:false,
+            lesson:{},
+        }) 
+    }
     render() {
         const {chapters} = this.props;
-        const {expandedRowKeys} = this.state
+        const {expandedRowKeys,isShowVideoModal,lesson} = this.state
         const columns = [
             {
                 title:'名称',
@@ -52,6 +73,21 @@ class List extends Component {
                 key:"free",
                 render:(free)=>{
                     return free === undefined ? "" : free ? "是" :"否";
+                }
+            },
+            {
+                title:"视频",
+                key:"video",
+                render:(lesson)=>{
+                    return (
+                        "video" in lesson && (
+                            <Tooltip title="预览视频">
+                                <Button onClick={this.showVideoModal(lesson)}>
+                                    <EyeOutlined />
+                                </Button>
+                            </Tooltip>
+                        )
+                    )
                 }
             },
             {
@@ -127,6 +163,21 @@ class List extends Component {
                         defaultPageSize:10,
                     }}
                 />
+                <Modal
+                    title={lesson.title}
+                    visible={isShowVideoModal}
+                    onCancel={this.hiddenVidoModal}
+                    footer={null}
+                    centered
+                    destroyOnClose={true}
+                    >
+                    <Player sources={{
+                        hd: {
+                            play_url:lesson.video,
+
+                          }
+                    }} />
+                </Modal>
             </div>
         );
     }

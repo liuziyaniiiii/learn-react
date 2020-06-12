@@ -10,3 +10,18 @@ export function reqGetAllLessonList(chapterId){
         method:"GET",
     });
 }
+
+
+//新增课时
+export function reqAddLesson({chapterId,title,free,video}){
+    return request({
+        url:`${BASE_URL}/save`,
+        method:"POST",
+        data:{
+            chapterId,
+            title,
+            free,
+            video
+        }
+    });
+}
