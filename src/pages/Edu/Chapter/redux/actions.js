@@ -1,8 +1,8 @@
 import {reqGetAllCourseList} from "@api/edu/course"
 import {reqGetAllChapterList} from "@api/edu/chapter"
-import {reqGetAllLessonList} from "@api/edu/lesson"
+import {reqGetAllLessonList,reqBatchRemoveLessonList} from "@api/edu/lesson"
 
-import {GET_ALL_COURSE_LIST,GET_ALL_CHAPTER_LIST,GET_ALL_LESSON_LIST} from "./constants"
+import {GET_ALL_COURSE_LIST,GET_ALL_CHAPTER_LIST,GET_ALL_LESSON_LIST,BATCH_REMOVE_LESSON_LIST} from "./constants"
 
 
 //得到所有课程分类
@@ -49,6 +49,21 @@ export const getAllLessonList = (chapterId)=>{
         return reqGetAllLessonList(chapterId).then((response)=>{
             dispatch(getAllLessonListSync({chapterId,lessons:response}));
             return response;
+        });
+    };
+};
+//批量删除课时数据
+const batchRemoveLessonListSync = (idList)=>({
+    type:BATCH_REMOVE_LESSON_LIST,
+    data:idList
+})
+
+
+export const batchRemoveLessonList = (idList)=>{
+    return (dispatch)=>{
+        return reqBatchRemoveLessonList(idList).then((response)=>{
+            dispatch(batchRemoveLessonListSync(idList));
+            return idList;
         });
     };
 };
