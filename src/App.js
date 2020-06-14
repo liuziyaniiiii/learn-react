@@ -1,5 +1,9 @@
 import React from "react";
 import { Router } from "react-router-dom";
+import {IntlProvider} from "react-intl"
+import {zh,en} from "./locales";
+
+
 import history from "@utils/history";
 
 import Layout from "./layouts";
@@ -7,9 +11,16 @@ import Layout from "./layouts";
 import "./assets/css/reset.css";
 
 function App() {
+  const locale = "zh";
+  const messages = locale === "en" ? en : zh;
   return (
     <Router history={history}>
-      <Layout />
+      <IntlProvider
+        locale={locale}
+        messages={messages}
+      >
+        <Layout />
+      </IntlProvider>
     </Router>
   );
 }
