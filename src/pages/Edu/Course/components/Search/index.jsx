@@ -11,7 +11,7 @@ import "./index.less";
 
 const { Option } = Select;
 
-function Search({getCourseList,getSearchData}) {
+function Search({getCourseList,getSearchFormData}) {
   const intl = useIntl();
   const [form] = Form.useForm();
   const [teachers,setTeachers] = useState([]);
@@ -91,7 +91,7 @@ function Search({getCourseList,getSearchData}) {
       subjectId,
       subjectParentId,
     });
-    getSearchData({title,teacherId, subjectId,subjectParentId})
+    getSearchFormData({title,teacherId, subjectId,subjectParentId})
     message.success("查询课程分类成功")
   };
 

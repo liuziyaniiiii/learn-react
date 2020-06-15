@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Layout, Menu, Dropdown, Breadcrumb } from "antd";
+import { Layout, Menu, Dropdown, Breadcrumb,Button } from "antd";
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -17,6 +17,7 @@ import { logout } from "@redux/actions/login";
 import { resetUser } from "../../components/Authorized/redux";
 import logo from "@assets/images/logo.png";
 import { findPathIndex } from "@utils/tools";
+import {changeLanguageSync} from "@redux/actions/lang"
 
 // 引入组件公共样式
 import "@assets/css/common.less";
@@ -27,10 +28,12 @@ const { Header, Sider, Content } = Layout;
 @connect(
   (state) => ({
     user: state.user,
+    language:state.language,
   }),
   {
     logout,
     resetUser,
+    changeLanguageSync,
   }
 )
 @withRouter
@@ -54,16 +57,13 @@ class PrimaryLayout extends Component {
     });
   };
 
-  langmenu = (
-    <Menu>
-      <Menu.Item key="zh">
-        中文
-      </Menu.Item>
-      <Menu.Item key="en">
-        English
-      </Menu.Item>
-    </Menu>
-  )
+  
+
+  clickLang = (lang)=>{
+    return()=>{
+      this.props.changeLanguageSync(lang)
+    };
+  };
 
   menu = (
     <Menu style={{ width: 150 }} onClick={this.logout}>
@@ -152,6 +152,29 @@ class PrimaryLayout extends Component {
 
     const route = this.selectRoute(routes, pathname);
 
+    const langMenu = (
+      <Menu selectable>
+        <Menu.Item key="zh">
+          <Button
+            style={this.props.language === "zh" ? {color:"red"} :{}} 
+            type="link"
+            onClick={this.clickLang("zh")}
+          >
+           中文
+          </Button>
+        </Menu.Item>
+        <Menu.Item key="en">
+          <Button
+            type="link"
+            onClick={this.clickLang("en")}
+            style={this.props.language === "en" ? {color:"red"} :{}}
+          >
+           English
+          </Button>
+        </Menu.Item>
+      </Menu>
+    )
+
     return (
       <Layout className="layout">
         <Sider trigger={null} collapsible collapsed={collapsed}>
@@ -181,7 +204,7 @@ class PrimaryLayout extends Component {
                   </span>
                 </Dropdown>
                 <span className="site-layout-lang">
-                  <Dropdown overlay={this.langmenu}>
+                  <Dropdown overlay={langMenu}>
                    <GlobalOutlined />
                   </Dropdown>
                 </span>

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import { Button, message, Table, Tooltip, Modal } from "antd";
 import {
   FormOutlined,
@@ -24,7 +24,7 @@ import "./index.less";
   }),
   { getCourseList }
 )
-class Course extends Component {
+class Course extends PureComponent {
   state = {
     searchLoading: false,
     tableLoading: false,
@@ -34,11 +34,7 @@ class Course extends Component {
     previewImage: "",
     searchData:{}
   };
-  getSearchData = ({teacherId,title,subjectId,subjectParentId})=>{
-    this.setState({
-      searchData:{teacherId,title,subjectId,subjectParentId}
-    })
-  }
+  
 
   search = (searchName) => {
     this.setState({
@@ -129,10 +125,10 @@ class Course extends Component {
       dataIndex: "price",
       render: (text) => <span>{`￥ ${text}`}</span>,
       width: 120,
-      sorter: {
-        compare: (a, b) => b.price - a.price,
-      },
-      // sorter: true // 后台排序~
+      // sorter: {
+      //   compare: (a, b) => b.price - a.price,
+      // },
+      sorter: true // 后台排序~
     },
     {
       title: "课程讲师",
@@ -216,6 +212,28 @@ class Course extends Component {
         message.success("获取用户列表数据成功");
       });
   };
+ 
+  sortTable = (sorter)=>{
+    const searchData = this.searchData
+    const {page,limit} = this.state;
+    const {field,order} = sorter
+
+    if(!searchData){
+      message.warn("请先搜索")
+      return;
+    }
+    const sort = order === "ascend" ? 1 : order === "descend" ? "-1" : undefined ;
+    this.props.getCourseList({...searchData,page,limit,sortBy:field,sort});
+  }
+
+  getSearchFormData = (data)=>{
+    // this.setState({
+    //   data
+    // })
+    this.searchData = data
+  }
+  searchData = null;
+
 
   render() {
     const {
@@ -233,13 +251,11 @@ class Course extends Component {
         index:index+1
       }
     })
-    // sortTable = (sorter)=>{
-
-    // }
+    
     return (
       <div>
         <div className="course-search">
-          <Search getSearchData={this.getSearchData}/>
+          <Search getSearchFormData={this.getSearchFormData}/>
         </div>
 
         <div className="course-table">
@@ -277,7 +293,7 @@ class Course extends Component {
             }}
             loading={tableLoading}
             scroll={{ x: 1200 }}
-            // onChange={this.sortTable}
+            onChange={this.sortTable}
           />
         </div>
 
