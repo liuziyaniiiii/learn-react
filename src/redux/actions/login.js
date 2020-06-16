@@ -18,17 +18,17 @@ import { LOGIN_SUCCESS, REMOVE_TOKEN } from "../constants/login";
 //     });
 //   };
 // };
-
-const loginSuccessSync = user =>({
+// 登录
+const loginSuccessSync = (token) =>({
   type:LOGIN_SUCCESS,
-  data:user
+  data:token
 });
 
 export const login = (username,password)=>{
-  return dispatch =>{
-    return reqLogin(username,password).then(response=>{
-      dispatch(loginSuccessSync(response));
-      return response.token;
+  return (dispatch) =>{
+    return reqLogin(username,password).then(({token})=>{
+      dispatch(loginSuccessSync(token));
+      return token;
     });
   };
 };

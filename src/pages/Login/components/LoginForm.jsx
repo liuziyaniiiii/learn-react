@@ -1,8 +1,14 @@
 import React from 'react'
 import {Form,Tabs,Input ,Row,Col,Button,Checkbox} from 'antd'
 import { UserOutlined,LockOutlined,MobileOutlined ,WechatOutlined,GithubOutlined,QqOutlined } from '@ant-design/icons';
+import {connect} from "react-redux"
+import {withRouter} from "react-router-dom"
+import {login} from "@redux/actions/login"
+
+
 import './index.less'
 const {TabPane} = Tabs;
+
 
 const rules = [
     {required:true,},
@@ -14,14 +20,27 @@ const rules = [
     },
 ]
 
-export default function LoginForm() {
+
+function LoginForm({login,history}) {
+
+    const finish = async (values)=>{
+        const {username,password,rem} = values;
+        const token = await login(username,password);
+        if(rem){
+            localStorage.setItem("user_token",token);
+        }
+        history.replace("/")
+    }
+
     const validateMessages = {
         required: "请输入 ${name} ",
       };
 
     return (
         <Form validateMessages={validateMessages} 
-        initialValues={{rem:{checked:true}}}>
+        initialValues={{rem:"checked"}}
+        onFinish={finish}
+        >
             <Tabs>
                 <TabPane tab="账户密码登录" key="user">
                     <Form.Item name="username" 
@@ -100,7 +119,7 @@ export default function LoginForm() {
                 </Col>
             </Row>
             <Form.Item>
-                <Button type="primary" className="login-form-btn">登录</Button>
+                <Button type="primary" htmlType="submit" className="login-form-btn" >登录</Button>
             </Form.Item>
             <Row justify="space-between">
                 <Col>
@@ -122,3 +141,5 @@ export default function LoginForm() {
         </Form>
     )
 }
+
+export default withRouter(connect(null,{login})(LoginForm))
