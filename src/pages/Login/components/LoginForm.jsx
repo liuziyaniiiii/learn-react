@@ -1,10 +1,10 @@
-import React from 'react'
-import {Form,Tabs,Input ,Row,Col,Button,Checkbox} from 'antd'
+import React,{useState} from 'react'
+import {Form,Tabs,Input ,Row,Col,Button,Checkbox,message} from 'antd'
 import { UserOutlined,LockOutlined,MobileOutlined ,WechatOutlined,GithubOutlined,QqOutlined } from '@ant-design/icons';
 import {connect} from "react-redux"
 import {withRouter} from "react-router-dom"
-import {login} from "@redux/actions/login"
-
+import {login,mobileLogin} from "@redux/actions/login"
+import {reqsendCode} from "@api/acl/oauth"
 
 import './index.less'
 const {TabPane} = Tabs;
@@ -20,28 +20,90 @@ const rules = [
     },
 ]
 
+const TOTAL_TIME=60;
+let countingDownTime = TOTAL_TIME;
 
-function LoginForm({login,history}) {
+function LoginForm({login,mobileLogin,history}) {
+
+    const [form] = Form.useForm();
+    // 初始化倒计时 
+    const [,setCountingDownTime] = useState(0);
+    // 标识要不要进入倒计时(是否已经发送验证码)
+    const [isSendCode,setIsSendCode] = useState(false);
+
+    const [activekey,setActivekey] = useState("user");
+
+    const handleTabChange = (key)=>{
+        // console.log(key);
+        setActivekey(key)
+    }
 
     const finish = async (values)=>{
-        const {username,password,rem} = values;
-        const token = await login(username,password);
-        if(rem){
-            localStorage.setItem("user_token",token);
+        if (activekey ==="user"){
+            form
+                .validateFields(['username','password','rem'])
+                .then( async (values)=>{
+                    const {username,password,rem} = values;
+                    const token = await login(username,password);
+                    if(rem){ 
+                        localStorage.setItem("user_token",token);
+                    }
+                    history.replace("/");
+                })
+            
+            return;
         }
-        history.replace("/")
+            form
+                .validateFields(['mobile','code','rem'])
+                .then( async (values)=>{
+                    const {mobile,code,rem} = values;
+                    const token = await mobileLogin(mobile,code);
+                    if(rem){ 
+                        localStorage.setItem("user_token",token);
+                    }
+                    history.replace("/");
+                })
+
     }
 
     const validateMessages = {
         required: "请输入 ${name} ",
       };
+    
+    const countingDown =() => {
+        const timer = setInterval(()=>{
+            countingDownTime--;
+            if(countingDownTime<=0){
+                clearInterval(timer);
+                countingDownTime = TOTAL_TIME;
+                setIsSendCode (false);
+                return
+            }
+            setCountingDownTime(countingDownTime)
+        },1000)   
+    };
+    
+    //   点击发送验证码
+    const sendCode =()=>{
+        // 手动触发表单校验规则
+        form.validateFields(['mobile'])
+            .then( async ({mobile})=>{
+                await reqsendCode(mobile)
+                setIsSendCode(true)//代表已经发送过验证码
+                countingDown()
+                message.success("验证码发送成功")
+            })
+            .catch((err)=>{})
+    }
 
     return (
-        <Form validateMessages={validateMessages} 
-        initialValues={{rem:"checked"}}
-        onFinish={finish}
+        <Form 
+            form={form}
+            validateMessages={validateMessages} 
+            initialValues={{rem:"checked"}}
+            // onFinish={finish}
         >
-            <Tabs>
+            <Tabs activeKey={activekey} onChange={handleTabChange}>
                 <TabPane tab="账户密码登录" key="user">
                     <Form.Item name="username" 
                     //  rules={[
@@ -86,24 +148,34 @@ function LoginForm({login,history}) {
                         >
                             <Input prefix={<MobileOutlined />} placeholder="手机号" />
                         </Form.Item>
-                        <Form.Item
-                             name="code"
-                            rules={[
-                            {
-                                required: true,
-                                message: "请输入验证码",
-                            },
-                            {
-                                pattern: /^[0-9]{6}$/,
-                                message: "请输入正确的验证码",
-                            },
-                            ]}
-                        >
-                            <div className="login-form-phone">
+                        <Row justify="space-between">
+                            <Col>
+                                <Form.Item
+                                name="code"
+                                rules={[
+                                {
+                                    required: true,
+                                    message: "请输入验证码",
+                                },
+                                {
+                                    pattern: /^[0-9]{6}$/,
+                                    message: "请输入正确的验证码",
+                                },
+                                ]}
+                                >
+                                
                                 <Input placeholder="验证码" />
-                                <Button >点击发送验证码</Button>
-                            </div>
-                        </Form.Item>
+                                </Form.Item>
+                            </Col>
+                        
+                            <Col>
+                                <Form.Item>
+                                <Button onClick={sendCode} disabled={isSendCode}>
+                                    {isSendCode ? `${countingDownTime}秒后可重发` : "点击发送验证码"}
+                                </Button> 
+                                </Form.Item>
+                            </Col>
+                        </Row>
                 </TabPane>   
             </Tabs>
             <Row justify="space-between">
@@ -119,7 +191,7 @@ function LoginForm({login,history}) {
                 </Col>
             </Row>
             <Form.Item>
-                <Button type="primary" htmlType="submit" className="login-form-btn" >登录</Button>
+                <Button type="primary" onClick={finish} className="login-form-btn" >登录</Button>
             </Form.Item>
             <Row justify="space-between">
                 <Col>
@@ -142,4 +214,4 @@ function LoginForm({login,history}) {
     )
 }
 
-export default withRouter(connect(null,{login})(LoginForm))
+export default withRouter(connect(null,{login,mobileLogin})(LoginForm))
