@@ -4,16 +4,30 @@ import { LOGIN_SUCCESS, REMOVE_TOKEN } from "../constants/login";
 /**
  * 登陆
  */
-const loginSuccessSync = user => ({
-  type: LOGIN_SUCCESS,
-  data: user
+// const loginSuccessSync = user => ({
+//   type: LOGIN_SUCCESS,
+//   data: user
+// });
+
+// export const login = (username, password) => {
+//   return dispatch => {
+//     return reqLogin(username, password).then(response => {
+//       dispatch(loginSuccessSync(response));
+//       // 返回token，外面才能接受
+//       return response.token;
+//     });
+//   };
+// };
+
+const loginSuccessSync = user =>({
+  type:LOGIN_SUCCESS,
+  data:user
 });
 
-export const login = (username, password) => {
-  return dispatch => {
-    return reqLogin(username, password).then(response => {
+export const login = (username,password)=>{
+  return dispatch =>{
+    return reqLogin(username,password).then(response=>{
       dispatch(loginSuccessSync(response));
-      // 返回token，外面才能接受
       return response.token;
     });
   };
