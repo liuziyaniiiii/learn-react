@@ -5,6 +5,7 @@ import {connect} from "react-redux"
 import {withRouter} from "react-router-dom"
 import {login,mobileLogin} from "@redux/actions/login"
 import {reqsendCode} from "@api/acl/oauth"
+import {CLIENT_ID} from "@conf/oauth";
 
 import './index.less'
 const {TabPane} = Tabs;
@@ -94,6 +95,10 @@ function LoginForm({login,mobileLogin,history}) {
                 message.success("验证码发送成功")
             })
             .catch((err)=>{})
+    }
+
+    const goGithub =()=>{
+        window.location.href = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}`
     }
 
     return (
@@ -198,7 +203,7 @@ function LoginForm({login,mobileLogin,history}) {
                     <Form.Item>
                         <div className="login-form-icon">
                             <span>其他登录方式</span>
-                            <GithubOutlined className="icons"/>
+                            <GithubOutlined className="icons" onClick={goGithub}/>
                             <QqOutlined className="icons"/>
                             <WechatOutlined className="icons" />
                         </div>

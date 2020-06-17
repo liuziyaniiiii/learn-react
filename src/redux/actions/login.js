@@ -22,7 +22,7 @@ export const mobileLogin = (mobile,code)=>{
     });
   };
 };
-const loginSuccessSync = (token) =>({
+export const loginSuccessSync = (token) =>({
   type:LOGIN_SUCCESS,
   data:token
 });
