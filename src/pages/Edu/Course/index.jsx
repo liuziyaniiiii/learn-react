@@ -10,17 +10,16 @@ import {
   RedoOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-
+import { FormattedMessage } from "react-intl";
 import { connect } from "react-redux";
 import Search from "./components/Search";
 import { getCourseList } from "./redux";
 
-// import { filterPermissions } from "@utils/permission";
 import "./index.less";
 
 @connect(
   (state) => ({
-    courseList: state.courseList
+    courseList: state.courseList,
   }),
   { getCourseList }
 )
@@ -32,9 +31,7 @@ class Course extends PureComponent {
     limit: 5, // 每页显示条数
     previewVisible: false,
     previewImage: "",
-    searchData:{}
   };
-  
 
   search = (searchName) => {
     this.setState({
@@ -125,10 +122,10 @@ class Course extends PureComponent {
       dataIndex: "price",
       render: (text) => <span>{`￥ ${text}`}</span>,
       width: 120,
-      // sorter: {
+      // sorter: { // 前端排序
       //   compare: (a, b) => b.price - a.price,
       // },
-      sorter: true // 后台排序~
+      sorter: true, // 后台排序~
     },
     {
       title: "课程讲师",
@@ -145,6 +142,9 @@ class Course extends PureComponent {
       dataIndex: "lessonNum",
       width: 100,
       render: (text) => <span>{`${text} 小时`}</span>,
+      sorter: {
+        compare: (a, b) => b.lessonNum - a.lessonNum,
+      },
     },
     {
       title: "总阅读量",
@@ -177,7 +177,7 @@ class Course extends PureComponent {
       title: "操作",
       render: this.renderTableItem,
       width: 200,
-      fixed: "right",
+      fixed: "right", // 固定在右侧
     },
   ];
 
@@ -187,11 +187,13 @@ class Course extends PureComponent {
   }
 
   handleTableChange = (page, limit) => {
+    // 切换loading状态
     this.setState({
       tableLoading: true,
     });
 
-    const {searchData} =this.state
+    const { searchData } = this.state;
+
     this.props.getCourseList({ page, limit, ...searchData }).finally(() => {
       this.setState({
         tableLoading: false,
@@ -212,28 +214,46 @@ class Course extends PureComponent {
         message.success("获取用户列表数据成功");
       });
   };
- 
-  sortTable = (sorter)=>{
-    const searchData = this.searchData
-    const {page,limit} = this.state;
-    const {field,order} = sorter
 
-    if(!searchData){
-      message.warn("请先搜索")
+  sortTable = (pagination, filters, sorter) => {
+    const searchData = this.searchData;
+    const { page, limit } = this.state;
+    const { field, order } = sorter;
+    // console.log(sorter);
+
+    if (!searchData) {
+      message.warn("请先搜索~");
       return;
     }
-    const sort = order === "ascend" ? 1 : order === "descend" ? "-1" : undefined ;
-    this.props.getCourseList({...searchData,page,limit,sortBy:field,sort});
-  }
 
-  getSearchFormData = (data)=>{
+    const sort = order === "ascend" ? 1 : order === "descend" ? -1 : undefined;
+
+    this.props.getCourseList({
+      ...searchData,
+      page,
+      limit,
+      sortBy: field,
+      sort,
+    });
+  };
+
+  getSearchFormData = (data) => {
+    /*
+      数据保存在state还是this上?
+        数据有没有直接涉及到当前组件更新
+          有 --> state
+          没有 --> this 优点：state数据少，将来优化时PureComponent内部遍历次数少~
+    */
+
+    // 更新状态属性
     // this.setState({
     //   data
     // })
-    this.searchData = data
-  }
-  searchData = null;
+    // 更新成this上的普通属性
+    this.searchData = data;
+  };
 
+  searchData = null;
 
   render() {
     const {
@@ -244,23 +264,26 @@ class Course extends PureComponent {
       previewImage,
     } = this.state;
 
-    const {courseList} = this.props
-    const courses = courseList.items.map((course,index)=>{
-      return{
+    const { courseList } = this.props;
+
+    const courses = courseList.items.map((course, index) => {
+      return {
         ...course,
-        index:index+1
-      }
-    })
-    
+        index: index + 1,
+      };
+    });
+
     return (
       <div>
         <div className="course-search">
-          <Search getSearchFormData={this.getSearchFormData}/>
+          <Search getSearchFormData={this.getSearchFormData} />
         </div>
 
         <div className="course-table">
           <div className="course-table-header">
-            <h3>课程数据列表</h3>
+            <h3>
+              <FormattedMessage id="courseList" />
+            </h3>
             <div>
               <Button type="primary" style={{ marginRight: 10 }}>
                 <PlusOutlined />
@@ -287,7 +310,7 @@ class Course extends PureComponent {
               pageSizeOptions: ["5", "10", "20", "30", "40", "50", "100"],
               showQuickJumper: true,
               showSizeChanger: true,
-              total:courseList.total,
+              total: courseList.total,
               onChange: this.handleTableChange,
               onShowSizeChange: this.handleTableChange,
             }}

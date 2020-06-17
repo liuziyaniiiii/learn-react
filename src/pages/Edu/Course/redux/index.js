@@ -1,5 +1,5 @@
-import courseList from './reducer'
+import courseList from "./reducer";
 
-import {getCourseList} from './actions'
+import { getCourseList } from "./actions";
 
-export {courseList,getCourseList}
+export { courseList, getCourseList };

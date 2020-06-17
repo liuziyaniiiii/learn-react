@@ -1,16 +1,16 @@
-import chapter from './reducer';
+import chapter from "./reducer";
 
 import {
-    getAllCourseList,
-    getAllChapterList,
-    getAllLessonList,
-    batchRemoveLessonList,
-} from './actions';
+  getAllCourseList,
+  getChapterList,
+  getLessonList,
+  batchRemoveLessonList,
+} from "./actions";
 
 export {
-    chapter,
-    getAllCourseList,
-    getAllChapterList,
-    getAllLessonList,
-    batchRemoveLessonList
+  chapter,
+  getAllCourseList,
+  getChapterList,
+  getLessonList,
+  batchRemoveLessonList,
 };

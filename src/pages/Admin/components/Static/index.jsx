@@ -156,6 +156,8 @@ export default class Static extends Component {
     return (
       <div className="static">
         <Tabs
+          // defaultActiveKey="1"
+          // tabPosition={mode}
           style={{ height: 600 }}
         >
           {data.map((item) => (
@@ -171,6 +173,7 @@ export default class Static extends Component {
                 </div>
               }
               key={item.key}
+              // disabled={i === 28} // 不能选中
             >
               <Chart height={400} data={lineData} autoFit>
                 <Legend position="top" />
@@ -185,6 +188,30 @@ export default class Static extends Component {
                   crosshairs={{
                     type: "y",
                   }}
+                  // custom={true}
+                  //         containerTpl={`
+                  //   <div class="g2-tooltip"><div class="g2-tooltip-title" style="margin-bottom: 4px;"></div>
+                  //   <table>
+                  //     <thead>
+                  //       <tr>
+                  //         <th>&nbsp;</th>
+                  //         <th>名称</td>
+                  //         <th>值</td>
+                  //       </tr>
+                  //     <thead>
+                  //     <tbody
+                  //       class="g2-tooltip-list"
+                  //     >
+                  //     </tbody>
+                  //   <table>
+                  //   `}
+                  //         itemTpl={`
+                  //     <tr data-index={index}>'
+                  //       <td><span style="background-color:{color};width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:8px;"></span></td>
+                  //       <td>{name}</td>
+                  //       <td>{value}</td>
+                  //     </tr>
+                  //  `}
                 />
                 <Geom
                   type="line"
