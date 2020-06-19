@@ -1,20 +1,19 @@
 import React, { Component } from "react";
 import { Layout, Menu, Breadcrumb } from "antd";
-import {
-  DesktopOutlined,
-  PieChartOutlined,
-  FileOutlined,
-  TeamOutlined,
-  UserOutlined,
-  GlobalOutlined,
-} from "@ant-design/icons";
+import {connect} from "react-redux";
+import {withRouter} from "react-router-dom";
+import {GlobalOutlined} from "@ant-design/icons";
 
+import {defaultRoutes} from "@conf/routes";
+import  SideMenu from "../SideMenu"
 import logo from "@assets/images/logo.png";
 import "./index.less";
 
 const { Header, Content, Footer, Sider } = Layout;
-const { SubMenu } = Menu;
 
+
+@withRouter
+@connect((state)=>({user:state.user}))
 class PrimaryLayout extends Component {
   state = {
     collapsed: false,
@@ -23,9 +22,38 @@ class PrimaryLayout extends Component {
   onCollapse = (collapsed) => {
     this.setState({ collapsed });
   };
-
+  // 获取当前路由配置
+  getCurrentRoute = (permissionList,pathname)=>{
+    for(let i =0;i<permissionList.length;i++){
+      const route = permissionList[i];
+      if(route.path === pathname){
+        return{
+          ...route,
+          children:undefined,
+        };
+      }
+      const {children} = route;
+      if(children && children.length){
+        for(let j=0;j<children.length;j++){
+          const item = children[j];
+          const currentPath = route.path + item.path;
+          if(currentPath === pathname){
+            return {
+              ...route,
+              children:item,
+            };
+          }
+        }
+      }
+    }
+  }
   render() {
     const { collapsed } = this.state;
+    const {user,location:{pathname}} = this.props;
+    let currentRoute = this.getCurrentRoute(defaultRoutes,pathname);
+    if(!currentRoute){
+      currentRoute = this.getCurrentRoute(user.permissionList,pathname);
+    }
     return (
       <Layout className="layout">
         {/* 左侧导航 */}
@@ -39,24 +67,7 @@ class PrimaryLayout extends Component {
             <img src={logo} alt="logo" />
             {!collapsed && <h1>硅谷教育管理系统</h1>}
           </div>
-          <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
-            <Menu.Item key="1" icon={<PieChartOutlined />}>
-              Option 1
-            </Menu.Item>
-            <Menu.Item key="2" icon={<DesktopOutlined />}>
-              Option 2
-            </Menu.Item>
-            <SubMenu key="sub1" icon={<UserOutlined />} title="User">
-              <Menu.Item key="3">Tom</Menu.Item>
-              <Menu.Item key="4">Bill</Menu.Item>
-              <Menu.Item key="5">Alex</Menu.Item>
-            </SubMenu>
-            <SubMenu key="sub2" icon={<TeamOutlined />} title="Team">
-              <Menu.Item key="6">Team 1</Menu.Item>
-              <Menu.Item key="8">Team 2</Menu.Item>
-            </SubMenu>
-            <Menu.Item key="9" icon={<FileOutlined />} />
-          </Menu>
+          <SideMenu currentRoute={currentRoute}/>
         </Sider>
         {/* 右边布局 */}
         <Layout>
