@@ -1,34 +1,33 @@
 .loading {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  background-color: #fff;
-  z-index: 2000;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 350px;
+  display: flex;
   flex-direction: column;
   align-items: center;
-  h1 {
-    font-weight: bolder;
-    font-size: 40px;
-    margin-top: 300px;
-    margin-bottom: 20px;
-    img {
-      width: 50px;
-      margin-right: 20px;
-      margin-bottom: 10px;
-    }
+  padding: 10px 20px;
+}
+
+.loading-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  img {
+    display: block;
+    width: 50px;
+    height: 50px;
   }
-  p {
-    margin-bottom: 30px;
-    font-size: 16px;
+  h3 {
+    margin-bottom: 0;
+    font-size: 30px;
   }
 }
 
-/*
-  z-index
-    普通定位 1
-    高级定位 100
-    Modal   1000
-    loading 2000
-*/
+.loading-text {
+  margin: 20px 0;
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.5);
+}
