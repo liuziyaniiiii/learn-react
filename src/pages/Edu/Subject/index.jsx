@@ -12,11 +12,18 @@ import { connect } from "react-redux";
 
 import { getSubjectList, getSubSubjectList, updateSubject } from "./redux";
 import { reqDelSubject } from "@api/edu/subject";
+import {filterPermissions} from "@utils/tools";
 
 import "./index.less";
 
 @connect(
-  (state) => ({ subjectList: state.subjectList }), // 状态数据
+  (state) => ({ 
+    subjectList: state.subjectList,
+    permissionValueList:filterPermissions(
+      state.user.permissionValueList,
+      "subject"
+    ),//按钮权限列表
+   }), // 状态数据
   {
     // 更新状态数据的方法
     getSubjectList,
@@ -39,21 +46,7 @@ class Subject extends Component {
     this.getSubjectList(1, 10);
   }
 
-  /*
-    问题1： 展开第一项 展开第二项 关闭第二项 第一项数据发生了更新
-      原因：
-        不管展开还是关闭都会触发 handleExpandedRowsChange
-        [1, 2] --> [1] 就会拿着 1 重新发送请求，所以更新了第一项数据
-      解决：
-        关键点：判断当前是 展开 还是 关闭~
-          如果是展开，就要发送请求更新数据，还要更新expandedRowKeys
-          如果是关闭，就只要更新expandedRowKeys，而不需要发送请求
-        展开，长度会+1，而关闭，长度会-1
-        当前expandedRowKeys --> this.state.expandedRowKeys
-        最新expandedRowKeys --> 函数传入的参数
-  */
-  // 点击展开一级菜单
-  // expandedRowKeys展开的行项（如果有没有展开的会自动去掉）
+ 
   handleExpandedRowsChange = (expandedRowKeys) => {
     // console.log("handleExpandedRowsChange", expandedRowKeys);
     // 长度
@@ -177,24 +170,16 @@ class Subject extends Component {
   };
 
   render() {
-    const { subjectList } = this.props;
+    const { subjectList ,permissionValueList} = this.props;
     const { expandedRowKeys, current, pageSize } = this.state;
 
     const columns = [
       {
         // 表头显示的内容
         title: "分类名称",
-        // 当前列要显示data中哪个数据（显示数据的key属性）
-        // data[dataIndex]
-        // dataIndex: "title",
-        // 遍历元素需要唯一key属性
+        
         key: "title",
-        /*
-          render方法接受参数看dataIndex的值
-          如果dataIndex: title, render方法就能接受title的值
-          如果dataIndex: _id, render方法就能接受_id的值
-          如果dataIndex: '', render方法就能接受当前所有数据的值
-        */
+        
         render: (subject) => {
           // 点击按钮要更新的目标分类id
           const { subjectId } = this.state;
@@ -270,14 +255,16 @@ class Subject extends Component {
 
     return (
       <div className="subject">
-        <Button
+        {permissionValueList["subject.add"] && (
+          <Button
           type="primary"
           className="subject-btn"
           onClick={this.showAddSubject}
-        >
-          <PlusOutlined />
-          新建
-        </Button>
+          >
+            <PlusOutlined />
+            新建
+          </Button>
+        )}
         <Table
           columns={columns} // 决定列头
           expandable={{

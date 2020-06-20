@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {menu, Menu} from "antd";
+import {Menu} from "antd";
 import {connect} from "react-redux";
 import {Link} from "react-router-dom";
 import icons from "@conf/icons";
@@ -44,7 +44,7 @@ class SideMenu extends Component {
                 theme="dark"
                 defaultSelectedKeys={[
                     currentRoute.children
-                        ? currentRoute.path + currentRoute.children.path
+                        ? currentRoute.children.path
                         : currentRoute.path,
                 ]}
                 defaultOpenKeys={[currentRoute.path]}

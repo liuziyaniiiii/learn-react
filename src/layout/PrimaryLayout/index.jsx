@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Layout, Breadcrumb } from "antd";
 import { GlobalOutlined } from "@ant-design/icons";
 import { connect } from "react-redux";
+import {matchPath} from "react-router";
 import { withRouter } from "react-router-dom";
 
 import { defaultRoutes } from "@conf/routes";
@@ -42,15 +43,26 @@ class PrimaryLayout extends Component {
         for (let j = 0; j < children.length; j++) {
           // 二级菜单
           const item = children[j];
+
+          // 过滤删除按钮
+          if(!item.path) continue;
+
           // 拼成二级菜单完整路径（父级菜单路径 + 子及菜单路径）
           const currentPath = route.path + item.path;
 
-          if (currentPath === pathname) {
+          const currentRoute = {
+            ...item,
+            path:currentPath,
+          };
+
+          const match = matchPath(pathname,currentRoute);
+
+          if (match) {
             return {
               // 一级菜单
               ...route,
               // 二级菜单
-              children: item,
+              children: currentRoute,
             };
           }
         }
